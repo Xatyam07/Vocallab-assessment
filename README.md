@@ -3,7 +3,7 @@
 <div align="center">
 
 ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
-![JavaScript](https://img.shields.io/badge/TypeScript-Ready-blue?style=for-the-badge&logo=typescript)
+![JavaScript](https://img.shields.io/badge/JavaScript-Ready-blue?style=for-the-badge&logo=typescript)
 ![Nhost](https://img.shields.io/badge/Nhost-Authentication-purple?style=for-the-badge)
 ![Deepgram](https://img.shields.io/badge/Deepgram-Live%20Speech%20to%20Text-green?style=for-the-badge)
 ![Vite](https://img.shields.io/badge/Vite-Fast%20Build-yellow?style=for-the-badge&logo=vite)
