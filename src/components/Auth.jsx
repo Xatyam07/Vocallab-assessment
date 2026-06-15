@@ -46,34 +46,43 @@ export default function Auth() {
     console.log('Original email entered:', email);
     console.log('Sanitized email sent to Nhost:', sanitizedEmail);
 
-    if (activeTab === 'login') {
-      const res = await signInEmailPassword(sanitizedEmail, password);
-      console.log('SignIn Response:', res);
-      
-      if (res?.isError) {
-        const errMsg = res?.error?.message || (res?.error ? JSON.stringify(res.error) : 'Unknown signin error');
-        setAuthError(`Failed to sign in: ${errMsg} (attempted: ${sanitizedEmail})`);
-      } else if (res?.needsEmailVerification) {
-        setAuthError('Email verification is required by your Nhost project. Please verify your email before logging in, or disable "Require Verified Emails" in the Nhost dashboard Auth settings.');
-      }
-    } else {
-      const res = await signUpEmailPassword(sanitizedEmail, password);
-      console.log('SignUp Response:', res);
-      
-      if (res?.isError) {
-        const errMsg = res?.error?.message || (res?.error ? JSON.stringify(res.error) : 'Unknown signup error');
-        setAuthError(`Failed to sign up: ${errMsg} (attempted: ${sanitizedEmail})`);
-      } else if (res?.needsEmailVerification) {
-        setSuccessMsg(`Registration successful! A verification link has been sent to ${sanitizedEmail}. Please check your inbox/spam folder.`);
-        setEmail('');
-        setPassword('');
-        setActiveTab('login');
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+    const cleanFrontendUrl = frontendUrl.endsWith('/') ? frontendUrl.slice(0, -1) : frontendUrl;
+    const options = { redirectTo: `${cleanFrontendUrl}/token` };
+
+    try {
+      if (activeTab === 'login') {
+        const res = await signInEmailPassword(sanitizedEmail, password, options);
+        console.log('SignIn Response:', res);
+        
+        if (res?.isError) {
+          const errMsg = res?.error?.message || (res?.error ? JSON.stringify(res.error) : 'Unknown signin error');
+          setAuthError(`Failed to sign in: ${errMsg} (attempted: ${sanitizedEmail})`);
+        } else if (res?.needsEmailVerification) {
+          setAuthError('Email verification is required by your Nhost project. Please verify your email before logging in, or disable "Require Verified Emails" in the Nhost dashboard Auth settings.');
+        }
       } else {
-        setSuccessMsg(`Registration successful! Please sign in. (Sanitized Email: ${sanitizedEmail})`);
-        setEmail('');
-        setPassword('');
-        setActiveTab('login');
+        const res = await signUpEmailPassword(sanitizedEmail, password, options);
+        console.log('SignUp Response:', res);
+        
+        if (res?.isError) {
+          const errMsg = res?.error?.message || (res?.error ? JSON.stringify(res.error) : 'Unknown signup error');
+          setAuthError(`Failed to sign up: ${errMsg} (attempted: ${sanitizedEmail})`);
+        } else if (res?.needsEmailVerification) {
+          setSuccessMsg(`Registration successful! A verification link has been sent to ${sanitizedEmail}. Please check your inbox/spam folder.`);
+          setEmail('');
+          setPassword('');
+          setActiveTab('login');
+        } else {
+          setSuccessMsg(`Registration successful! Please sign in. (Sanitized Email: ${sanitizedEmail})`);
+          setEmail('');
+          setPassword('');
+          setActiveTab('login');
+        }
       }
+    } catch (err) {
+      console.error('Authentication Error:', err);
+      setAuthError(`Network or connection problem: ${err.message || 'Please check your internet connection and Nhost project configuration.'}`);
     }
   };
 

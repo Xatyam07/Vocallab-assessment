@@ -4,15 +4,20 @@ import { NhostClient } from '@nhost/react';
 
 const ConfigContext = createContext(null);
 
+const cleanEnvValue = (val) => {
+  if (!val || val === 'undefined' || val === 'null') return '';
+  return val.trim();
+};
+
 export const ConfigProvider = ({ children }) => {
   const [nhostSubdomain, setNhostSubdomain] = useState(
-    localStorage.getItem('nhost_subdomain') || import.meta.env.VITE_NHOST_SUBDOMAIN || ''
+    cleanEnvValue(import.meta.env.VITE_NHOST_SUBDOMAIN) || localStorage.getItem('nhost_subdomain') || ''
   );
   const [nhostRegion, setNhostRegion] = useState(
-    localStorage.getItem('nhost_region') || import.meta.env.VITE_NHOST_REGION || ''
+    cleanEnvValue(import.meta.env.VITE_NHOST_REGION) || localStorage.getItem('nhost_region') || ''
   );
   const [deepgramApiKey, setDeepgramApiKey] = useState(
-    localStorage.getItem('deepgram_key') || import.meta.env.VITE_DEEPGRAM_API_KEY || ''
+    cleanEnvValue(import.meta.env.VITE_DEEPGRAM_API_KEY) || localStorage.getItem('deepgram_key') || ''
   );
 
   // Initialize or re-initialize NhostClient whenever subdomain or region changes
@@ -59,9 +64,9 @@ export const ConfigProvider = ({ children }) => {
   };
 
   const clearConfig = () => {
-    setNhostSubdomain('');
-    setNhostRegion('');
-    setDeepgramApiKey('');
+    setNhostSubdomain(cleanEnvValue(import.meta.env.VITE_NHOST_SUBDOMAIN));
+    setNhostRegion(cleanEnvValue(import.meta.env.VITE_NHOST_REGION));
+    setDeepgramApiKey(cleanEnvValue(import.meta.env.VITE_DEEPGRAM_API_KEY));
     localStorage.removeItem('nhost_subdomain');
     localStorage.removeItem('nhost_region');
     localStorage.removeItem('deepgram_key');
